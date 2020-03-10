@@ -21,10 +21,11 @@ table {
   font-weight: 500;
   width: 200px;
   position: relative;
-  background-color: pink;
+  /* background-color: pink; */
   left: 115px;
   top: 21px;
   margin-bottom: -20px;
+  opacity: 0.8;
 }
 
 #logo {
@@ -57,7 +58,7 @@ table {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
-  align-items: planecenter;
+  align-items: center;
 }
 
 #desc-section {
@@ -109,4 +110,5 @@ footer {
 
 #flight-table {
   width: 100%;
+  border: 1px black solid;
 }

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 
 <head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Linia lotnicza</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='styles/main.css'>
-    <script src='js/main.js'></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="styles/main.css">
+    <script src="js/main.js"></script>
 </head>
 
 <body>
@@ -15,7 +15,7 @@
         <header>
             <h1 id="flight-list-header">Lista lotów</h1>
         </header>
-        <section class="single" id="desc-section">
+        <div class="single" id="desc-section">
             <img src="images/plane.webp" alt="logo" id="logo">
             <div id="desc">
                 <p id="pierwszy">
@@ -25,10 +25,10 @@
                     Najlepsza jakość w najlepszej cenie!!
                 </p>
             </div>
-        </section>
-        <section class="single" id="flights">
+        </div>
+        <div class="single" id="flights">
             <p id="wow">WOW super lot!</p>
-            <table border=1 id="flight-table">
+            <table id="flight-table">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -55,7 +55,7 @@
                     </tr>
                 </tbody>
             </table>
-        </section>
+        </div>
         <footer>
             <span id="credentials">Zrobione przez Huberta Badocha</span>
         </footer>
