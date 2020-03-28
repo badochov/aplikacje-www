@@ -272,3 +272,12 @@ menu{
   transform: translate(-50%, -50%);
   opacity: 1;
 }
+
+#delayed{
+  position: relative;
+}
+
+form#booking{
+  position: absolute;
+  bottom: 5px;
+}
