@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Page Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" type="text/css" media="screen" href="css/main.css" />
+</head>
+
+<body>
+  <main>
+    <section>
+      <h1>Opis</h1>
+      <p id="desc"></p>
+    </section>
+    <button id="start">Start</button>
+    <section id="excercise">
+      <h2>Pytanie <span id="excercise-number">1</span></h2>
+      <span id="prompt">2+2</span><br />
+      <label for="answer">Odpowiedź</label><br />
+      <input type="number" id="answer" />
+      <p id="penalty">
+        Kara za zła odpowiedź: <span id="penalty-time">0</span> sekund
+      </p>
+      <div class="controls">
+        <button id="previous">Poprzednie pytanie</button>
+        <button id="next">Nastepne pytanie</button>
+        <button id="stop" disabled>Stop</button>
+      </div>
+    </section>
+    <section id="result">
+      <h2>Wyniki</h2>
+      <div id="results"></div>
+      <div class="controls">
+        <button id = "save">Zapisz wynik</button>
+        <button id = "save-with-stats">Zapisz wynik ze statystykami</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="dist/main.js"></script>
+</body>
+
+</html>
