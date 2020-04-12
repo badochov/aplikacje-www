@@ -5,3 +5,11 @@
 #result {
 	display: none;
 }
+
+.correct {
+	color: lime;
+}
+
+.incorrect {
+	color: red;
+}

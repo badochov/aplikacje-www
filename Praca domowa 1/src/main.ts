@@ -11,9 +11,13 @@ const excerciseSection = document.getElementById('excercise') as HTMLDivElement;
 const penaltyTimeSpan = document.getElementById('penalty-time') as HTMLSpanElement;
 const descParagraph = document.getElementById('desc') as HTMLParagraphElement;
 const resultsDiv = document.getElementById('results') as HTMLDivElement;
+const correctnessDiv = document.getElementById('correctness') as HTMLDivElement;
 const resultSection = document.getElementById('result') as HTMLDivElement;
 const saveButton = document.getElementById('save') as HTMLButtonElement;
 const saveWithStatsButton = document.getElementById('save-with-stats') as HTMLButtonElement;
+
+const initResultSpan = document.getElementById('init-result') as HTMLSpanElement;
+const finalResultSpan = document.getElementById('final-result') as HTMLSpanElement;
 
 /**
  * May in the future be overwriten to function that display error on screen
@@ -148,13 +152,13 @@ class QuizRun {
 
 class QuizResults {
 	private penalties: number[] = [];
-	private finalTime: number = 0;
+	private initTime: number = 0;
 	constructor(private answers: Answer[], private quiz: Quiz | null) {
 		this.bindEventHandlers();
 		this.checkAnswers();
 		this.givePenalties();
 		this.calculateFinalTime();
-		this.show();
+		this.display();
 	}
 
 	private checkAnswers() {
@@ -187,18 +191,43 @@ class QuizResults {
 	}
 
 	private calculateFinalTime() {
-		this.finalTime = 0;
-		for (const p of this.penalties) {
-			this.finalTime += p;
-		}
+		this.initTime = 0;
 		for (const ans of this.answers) {
-			this.finalTime += ans.time / 1000;
+			this.initTime += ans.time / 1000;
 		}
 	}
 
-	private show() {
-		resultSection.style.display = 'block';
-		resultsDiv.textContent = JSON.stringify(this.answers) + JSON.stringify(this.penalties);
+	public get finalTime() {
+		let finalTime = this.initTime;
+		for (const p of this.penalties) {
+			finalTime += p;
+		}
+		return finalTime;
+	}
+
+	private display() {
+		if (this.quiz) {
+			resultSection.style.display = 'block';
+
+			initResultSpan.textContent = this.formatTime(this.initTime);
+			finalResultSpan.textContent = this.formatTime(this.finalTime);
+
+			// console.log(this.answers.entries());
+			for (const [ i, answer ] of this.answers.entries()) {
+				console.log(i, answer);
+				const div = document.createElement('div');
+				div.textContent = `${i + 1}. `;
+				const span = document.createElement('span');
+				span.className = answer.correct ? 'correct' : 'incorrect';
+				span.textContent = answer.correct ? 'Correct :)' : `Incorect: + ${this.quiz.questions[i].penalty}s`;
+				div.appendChild(span);
+				correctnessDiv.appendChild(div);
+			}
+		}
+	}
+
+	private formatTime(time: number): string {
+		return time.toFixed(3).toString();
 	}
 }
 
