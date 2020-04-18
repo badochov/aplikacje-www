@@ -9,19 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-function fib(n) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (n < 2) {
-            return Promise.resolve(n);
-        }
-        return (yield fib(n - 1)) + (yield (fib(n - 2)));
-    });
-}
-exports.fib = fib;
-function fib_sync(n) {
-    if (n < 2) {
-        return n;
+const main_1 = require("../main");
+const chai_1 = require("chai");
+require("mocha");
+const res = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
+describe('Fibonacci async', () => {
+    for (const i in res) {
+        const val = res[i];
+        it(`should equal ${val} for call with ${i}`, () => __awaiter(void 0, void 0, void 0, function* () {
+            chai_1.expect(yield main_1.fib(parseInt(i))).to.equal(val);
+        }));
     }
-    return fib_sync(n - 1) + fib_sync(n - 2);
-}
-exports.fib_sync = fib_sync;
+});
+describe('Fibonacci sync', () => {
+    for (const i in res) {
+        const val = res[i];
+        it(`should equal ${val} for call with ${i}`, () => {
+            chai_1.expect(main_1.fib_sync(parseInt(i))).to.equal(val);
+        });
+    }
+});
