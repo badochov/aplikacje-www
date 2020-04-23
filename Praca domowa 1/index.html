@@ -7,43 +7,55 @@
   <title>Page Title</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" type="text/css" media="screen" href="css/main.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="node_modules/bootstrap/dist/css/bootstrap.css" />
 </head>
 
 <body>
-  <main>
-    <section>
-      <h1>Opis</h1>
-      <p id="desc"></p>
-    </section>
-    <button id="start">Start</button>
-    <section id="excercise">
-      <h2>Pytanie <span id="excercise-number">1</span></h2>
-      <span id="prompt">2+2</span><br />
-      <label for="answer">Odpowiedź</label><br />
-      <input type="number" id="answer" />
-      <p id="penalty">
-        Kara za zła odpowiedź: <span id="penalty-time">0</span> sekund
-      </p>
-      <div class="controls">
-        <button id="previous">Poprzednie pytanie</button>
-        <button id="next">Nastepne pytanie</button>
-        <button id="stop" disabled>Stop</button>
-      </div>
-    </section>
-    <section id="result">
-      <h2>Wyniki</h2>
-      <div id="results">
-        Czas: <span id="init-result"></span>s
-        <div id="correctness">
+  <main class="container">
+      <section>
+        <h1>Opis quizu</h1>
+        <p id="desc"></p>
+      </section>
+      <button id="start" class="btn btn-primary">Zacznij nowy quiz</button>
+      <section id="excercise">
+        <h2>Pytanie <span id="excercise-number">1</span></h2>
+        <span id="prompt">2+2</span><br />
+        <label for="answer">Odpowiedź</label><br />
+        <input type="number" id="answer" class="form-control" />
+        <p id="penalty">
+          Kara za zła odpowiedź: <span id="penalty-time">0</span> sekund
+        </p>
+        <div class="controls row justify-content-md-center">
+          <div class="col-4 d-flex justify-content-center">
+            <button id="previous" class="btn btn-secondary">Poprzednie pytanie</button>
+          </div>
 
+          <div class="col-4 d-flex justify-content-center">
+            <button id="stop" disabled class="btn btn-success">Koniec</button>
+          </div>
+          <div class="col-4 d-flex justify-content-center">
+            <button id="next" class="btn btn-secondary">Następne pytanie</button>
+          </div>
         </div>
-        Wynik końcowy: <span id="final-result"></span>s
-      </div>
-      <div class="controls">
-        <button id = "save">Zapisz wynik</button>
-        <button id = "save-with-stats">Zapisz wynik ze statystykami</button>
-      </div>
-    </section>
+      </section>
+      <section id="result">
+        <h2>Wyniki</h2>
+        <div id="results">
+          Czas: <span id="init-result"></span>s
+          <div id="correctness">
+
+          </div>
+          Wynik końcowy: <span id="final-result"></span>s
+        </div>
+        <div class="controls row">
+          <div class="col-6 d-flex justify-content-center">
+            <button id="save" class="btn btn-success">Zapisz wynik</button>
+          </div>
+          <div class="col-6 d-flex justify-content-center">
+            <button id="save-with-stats" class="btn btn-warning">Zapisz wynik ze statystykami</button>
+          </div>
+        </div>
+      </section>
   </main>
 
   <script src="dist/main.js"></script>

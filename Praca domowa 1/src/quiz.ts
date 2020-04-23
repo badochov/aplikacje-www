@@ -1,3 +1,5 @@
+import { quiz } from './quizes';
+
 export interface Question {
 	prompt: string;
 	answer: number;
@@ -23,15 +25,10 @@ const isQuiz = (quiz: any): quiz is Quiz => {
 	return quiz.desc && quiz.questions;
 };
 
-export const getQuiz = async (name: string): Promise<Quiz | null> => {
-	try {
-		const raw = await fetch(`/quizes/${name}.json`);
-		const obj = await raw.json();
-		if (isQuiz(obj)) {
-			return Promise.resolve(obj);
-		}
-	} catch (err) {
-		console.error(err);
+export const getQuiz = (name: string): Quiz | null => {
+	const obj = JSON.parse(quiz);
+	if (isQuiz(obj)) {
+		return obj;
 	}
-	return Promise.resolve(null);
+	return null;
 };

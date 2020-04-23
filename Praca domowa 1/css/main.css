@@ -13,3 +13,22 @@
 .incorrect {
 	color: red;
 }
+
+#penalty-time {
+	font-weight: bold;
+}
+
+#prompt {
+	font-weight: bold;
+	font-size: 2em;
+}
+
+#final-result {
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+#init-result {
+	font-weight: bold;
+	font-size: 1.1em;
+}

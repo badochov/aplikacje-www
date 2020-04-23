@@ -32,10 +32,8 @@ class QuizRun {
 	private penalties: number[] = [];
 	private quizResults: QuizResults | null = null;
 
-	constructor(private quizName: string = 'example') {}
-
-	public async build(): Promise<void> {
-		this.quiz = await getQuiz(this.quizName);
+	constructor(private quizName: string = 'example') {
+		this.quiz = getQuiz(this.quizName);
 		if (this.quiz == null) {
 			error('Podany quiz nie istnieje');
 			return;
@@ -64,6 +62,7 @@ class QuizRun {
 		startButton.onclick = () => {
 			excerciseSection.style.display = 'block';
 			startButton.style.display = 'none';
+			this.answerStartTime = performance.now();
 
 			this.changeQuestion();
 		};
@@ -178,16 +177,33 @@ class QuizResults {
 	}
 
 	private bindEventHandlers() {
-		saveWithStatsButton.onclick = () => this.saveWithStats();
-		saveButton.onclick = () => this.save();
+		saveWithStatsButton.onclick = () => {
+			this.saveWithStats();
+			this.goToMainScreen();
+		};
+		saveButton.onclick = () => {
+			this.save();
+			this.goToMainScreen();
+		};
+	}
+
+	private goToMainScreen() {
+		window.location.reload();
 	}
 
 	private saveWithStats() {
-		localStorage.setItem('run1', JSON.stringify(this.answers));
+		this.saveItem(this.answers);
 	}
 
 	private save() {
-		localStorage.setItem('run1', JSON.stringify(this.finalTime));
+		this.saveItem(this.finalTime);
+	}
+
+	private saveItem(item: any) {
+		const prevJSON = localStorage.getItem('runs') || '[]';
+		const prev = JSON.parse(prevJSON) as Array<Answer | number>;
+		prev.push(item);
+		localStorage.setItem('runs', JSON.stringify(prev));
 	}
 
 	private calculateFinalTime() {
@@ -232,4 +248,3 @@ class QuizResults {
 }
 
 const quizRun = new QuizRun();
-quizRun.build();
