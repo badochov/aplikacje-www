@@ -32,3 +32,11 @@
 	font-weight: bold;
 	font-size: 1.1em;
 }
+
+#quiz-desc {
+	display: none;
+}
+
+.prev-result-even {
+	background-color: lightgray;
+}

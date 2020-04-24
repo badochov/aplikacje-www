@@ -1,6 +1,7 @@
 export const quiz =
 	'\
-    {    \
+    {\
+        "0":{    \
     "desc": "Liczyć każdy może",\
     "questions": [\
         {\
@@ -24,4 +25,4 @@ export const quiz =
             "penalty": 10\
         }\
     ]\
-}';
+}}';

@@ -25,10 +25,23 @@ const isQuiz = (quiz: any): quiz is Quiz => {
 	return quiz.desc && quiz.questions;
 };
 
-export const getQuiz = (name: string): Quiz | null => {
+export const getQuiz = (id: string): Quiz | null => {
 	const obj = JSON.parse(quiz);
-	if (isQuiz(obj)) {
-		return obj;
+	if (obj instanceof Object) {
+		if (isQuiz(obj[id])) {
+			return obj[id];
+		}
 	}
 	return null;
 };
+
+export function* getQuizes(): Generator<[string, Quiz]> {
+	const obj = JSON.parse(quiz);
+	if (obj instanceof Object) {
+		for (const id in obj) {
+			if (isQuiz(obj[id])) {
+				yield [ id, obj[id] ];
+			}
+		}
+	}
+}

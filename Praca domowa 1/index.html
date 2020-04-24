@@ -12,50 +12,77 @@
 
 <body>
   <main class="container">
-      <section>
-        <h1>Opis quizu</h1>
-        <p id="desc"></p>
-      </section>
-      <button id="start" class="btn btn-primary">Zacznij nowy quiz</button>
-      <section id="excercise">
-        <h2>Pytanie <span id="excercise-number">1</span></h2>
-        <span id="prompt">2+2</span><br />
+    <section id="quiz-choise">
+      <div class="row">
+        <div class="col12">
+          <h1>Wybór quizu</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12" id="quizes">
+          <div class="row">
+            <div class="col-8">Opis</div>
+            <div class="col-4">Akcja</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz-prev-results">
+      <div class="row">
+        <h1>Poprzednie wyniki</h1>
+      </div>
+      <div class="row">
+        <div class="col-1">#</div>
+        <div class="col-7">Opis quizu</div>
+        <div class="col-4">Wynik</div>
+      </div>
+
+    </section>
+    <section id="quiz-desc">
+      <h1>Opis quizu</h1>
+      <p id="desc"></p>
+    </section>
+    <section id="excercise">
+      <h2>Pytanie <span id="excercise-number"></span></h2>
+      <span id="prompt"></span><br />
+      <form action="index.html" id="answer-form">
         <label for="answer">Odpowiedź</label><br />
         <input type="number" id="answer" class="form-control" />
-        <p id="penalty">
-          Kara za zła odpowiedź: <span id="penalty-time">0</span> sekund
-        </p>
-        <div class="controls row justify-content-md-center">
-          <div class="col-4 d-flex justify-content-center">
-            <button id="previous" class="btn btn-secondary">Poprzednie pytanie</button>
-          </div>
+      </form>
+      <p id="penalty">
+        Kara za zła odpowiedź: <span id="penalty-time">0</span> sekund
+      </p>
+      <div class="controls row justify-content-md-center">
+        <div class="col-4 d-flex justify-content-center">
+          <button id="previous" class="btn btn-secondary">Poprzednie pytanie</button>
+        </div>
+        <div class="col-4 d-flex justify-content-center">
+          <button id="stop" disabled class="btn btn-success">Stop</button>
+        </div>
+        <div class="col-4 d-flex justify-content-center">
+          <button id="next" class="btn btn-secondary">Następne pytanie</button>
+        </div>
+      </div>
+    </section>
+    <section id="result">
+      <h2>Wyniki</h2>
+      <div id="results">
+        Czas: <span id="init-result"></span>s
+        <div id="correctness">
 
-          <div class="col-4 d-flex justify-content-center">
-            <button id="stop" disabled class="btn btn-success">Koniec</button>
-          </div>
-          <div class="col-4 d-flex justify-content-center">
-            <button id="next" class="btn btn-secondary">Następne pytanie</button>
-          </div>
         </div>
-      </section>
-      <section id="result">
-        <h2>Wyniki</h2>
-        <div id="results">
-          Czas: <span id="init-result"></span>s
-          <div id="correctness">
-
-          </div>
-          Wynik końcowy: <span id="final-result"></span>s
+        Wynik końcowy: <span id="final-result"></span>s
+      </div>
+      <div class="controls row">
+        <div class="col-6 d-flex justify-content-center">
+          <button id="save" class="btn btn-success">Zapisz wynik</button>
         </div>
-        <div class="controls row">
-          <div class="col-6 d-flex justify-content-center">
-            <button id="save" class="btn btn-success">Zapisz wynik</button>
-          </div>
-          <div class="col-6 d-flex justify-content-center">
-            <button id="save-with-stats" class="btn btn-warning">Zapisz wynik ze statystykami</button>
-          </div>
+        <div class="col-6 d-flex justify-content-center">
+          <button id="save-with-stats" class="btn btn-warning">Zapisz wynik ze statystykami</button>
         </div>
-      </section>
+      </div>
+    </section>
   </main>
 
   <script src="dist/main.js"></script>
