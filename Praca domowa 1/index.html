@@ -14,15 +14,15 @@
   <main class="container">
     <section id="quiz-choise">
       <div class="row">
-        <div class="col12">
-          <h1>Wybór quizu</h1>
+        <div class="col-12">
+          <h1 class="main-header">Wybór quizu</h1>
         </div>
       </div>
       <div class="row">
         <div class="col-12" id="quizes">
-          <div class="row">
-            <div class="col-8">Opis</div>
-            <div class="col-4">Akcja</div>
+          <div class="row table-header">
+            <div class="col-8 d-flex justify-content-center">Opis</div>
+            <div class="col-4 d-flex justify-content-center">Akcja</div>
           </div>
         </div>
       </div>
@@ -30,20 +30,24 @@
 
     <section id="quiz-prev-results">
       <div class="row">
-        <h1>Poprzednie wyniki</h1>
+        <div class="col-12">
+          <h1>Poprzednie wyniki</h1>
+        </div>
       </div>
-      <div class="row">
-        <div class="col-1">#</div>
-        <div class="col-7">Opis quizu</div>
-        <div class="col-4">Wynik</div>
+      <div class="row table-header">
+        <div class="col-8 d-flex justify-content-center">Opis quizu</div>
+        <div class="col-4 d-flex justify-content-center">Wynik</div>
       </div>
 
     </section>
     <section id="quiz-desc">
-      <h1>Opis quizu</h1>
-      <p id="desc"></p>
+      <h1 class="main-header">Opis quizu</h1>
+      <div id="desc-wrapper">
+        <p id="desc"></p>
+      </div>
     </section>
     <section id="excercise">
+      <div id="quick-access"></div>
       <h2>Pytanie <span id="excercise-number"></span></h2>
       <span id="prompt"></span><br />
       <form action="index.html" id="answer-form">
@@ -53,7 +57,7 @@
       <p id="penalty">
         Kara za zła odpowiedź: <span id="penalty-time">0</span> sekund
       </p>
-      <div class="controls row justify-content-md-center">
+      <div class="controls row">
         <div class="col-4 d-flex justify-content-center">
           <button id="previous" class="btn btn-secondary">Poprzednie pytanie</button>
         </div>

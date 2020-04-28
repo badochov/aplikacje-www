@@ -7,7 +7,7 @@ import {
 	finalResultSpan,
 	correctnessDiv,
 	quizPrevResultsSection
-} from './main';
+} from './HTMLElements';
 
 interface Result {
 	finalTime: number;
@@ -21,15 +21,22 @@ const isResult = (obj: any): obj is Result => {
 
 export class QuizResults {
 	private penalties: number[] = [];
-	private initTime: number = 0;
-	constructor(private answers: Answer[], private quiz: Quiz | null, private quizId: string) {
+
+	/**
+	 * @param answers array of marked answers
+	 * @param quiz quiz object
+	 * @param quizId chosen quiz id
+	 */
+	constructor(private answers: Answer[], private quiz: Quiz | null) {
 		this.bindEventHandlers();
 		this.checkAnswers();
 		this.givePenalties();
-		this.calculateFinalTime();
 		this.display();
 	}
 
+	/**
+	 * Checks answers, sets carrect argument in each answer to either true or false.
+	 */
 	private checkAnswers() {
 		if (this.quiz !== null) {
 			for (const i in this.answers) {
@@ -38,6 +45,9 @@ export class QuizResults {
 		}
 	}
 
+	/**
+	 * Gives penalties for each wrong answer.
+	 */
 	private givePenalties() {
 		if (this.quiz !== null) {
 			for (const i in this.answers) {
@@ -46,6 +56,9 @@ export class QuizResults {
 		}
 	}
 
+	/**
+	 * Bind neccessary event handlers.
+	 */
 	private bindEventHandlers() {
 		saveWithStatsButton.onclick = () => {
 			this.saveWithStats();
@@ -57,18 +70,31 @@ export class QuizResults {
 		};
 	}
 
+	/**
+	 * Goes back to main screen.
+	 */
 	private goToMainScreen() {
 		window.location.reload();
 	}
 
+	/**
+	 * Saves run results with stats.
+	 */
 	private saveWithStats() {
-		this.saveResult({ finalTime: this.finalTime, answers: this.answers, quizId: this.quizId });
+		this.saveResult({ finalTime: this.finalTime, answers: this.answers, quizId: this.quiz?.id ?? ""});
 	}
 
+	/**
+	 * Saves run results without stats.
+	 */
 	private save() {
-		this.saveResult({ finalTime: this.finalTime, quizId: this.quizId });
+		this.saveResult({ finalTime: this.finalTime, quizId: this.quiz?.id ?? "" });
 	}
 
+	/**
+	 * Saves given result.
+	 * @param result result
+	 */
 	private saveResult(result: Result) {
 		const prevJSON = localStorage.getItem('results') || '[]';
 		const prev = JSON.parse(prevJSON) as Array<Result>;
@@ -76,13 +102,20 @@ export class QuizResults {
 		localStorage.setItem('results', JSON.stringify(prev));
 	}
 
-	private calculateFinalTime() {
-		this.initTime = 0;
+	/**
+	 * Calculates time spent on quiz.
+	 */
+	private get initTime(): number {
+		let initTime = 0;
 		for (const ans of this.answers) {
-			this.initTime += ans.time / 1000;
+			initTime += ans.time / 1000;
 		}
+		return initTime;
 	}
 
+	/**
+	 * Calculates final time, base + penalties.
+	 */
 	public get finalTime() {
 		let finalTime = this.initTime;
 		for (const p of this.penalties) {
@@ -91,6 +124,9 @@ export class QuizResults {
 		return finalTime;
 	}
 
+	/**
+	 * Displays results.
+	 */
 	private display() {
 		if (this.quiz) {
 			resultSection.style.display = 'block';
@@ -112,14 +148,21 @@ export class QuizResults {
 		}
 	}
 
+	/**
+	 * Formats time, round to 3 digits.
+	 * @param time time
+	 */
 	public static formatTime(time: number): string {
 		return time.toFixed(3).toString();
 	}
 
+	/**
+	 * Displays previous results.
+	 */
 	public static displayPreviousResults(): void {
 		const results = JSON.parse(localStorage.getItem('results') || '');
 		let i = 1;
-		console.log(results);
+		console.log(results)
 		if (results instanceof Array) {
 			for (const res of results) {
 				console.log(res, isResult(res));
@@ -129,20 +172,15 @@ export class QuizResults {
 						const row = document.createElement('div');
 						const nameCol = document.createElement('div');
 						const resultCol = document.createElement('div');
-						const numberCol = document.createElement('div');
 
-						numberCol.className = 'col-1';
-						numberCol.textContent = i.toString();
-
-						resultCol.className = 'col-4';
+						resultCol.className = 'col-4 d-flex justify-content-center';
 						resultCol.textContent = QuizResults.formatTime(res.finalTime) + 's';
 
-						nameCol.className = 'col-7';
+						nameCol.className = 'col-8 d-flex justify-content-center';
 						nameCol.textContent = quiz.desc;
 
-						row.className = `row prev-result-${i % 2 == 0 ? 'even' : ''}`;
+						row.className = `row prev-result ${i % 2 == 0 ? 'even' : ''}`;
 
-						row.appendChild(numberCol);
 						row.appendChild(nameCol);
 						row.appendChild(resultCol);
 

@@ -9,6 +9,7 @@ export interface Question {
 export interface Quiz {
 	desc: string;
 	questions: Question[];
+	id: string;
 }
 
 export interface Answer {
@@ -22,25 +23,34 @@ const isQuestion = (question: any): question is Question => {
 };
 
 const isQuiz = (quiz: any): quiz is Quiz => {
-	return quiz.desc && quiz.questions;
+	return quiz.desc && quiz.questions && quiz.id !== undefined;
 };
 
+/**
+ * Returns quiz with given id or null on error.
+ * @param id quiz id
+ */
 export const getQuiz = (id: string): Quiz | null => {
-	const obj = JSON.parse(quiz);
-	if (obj instanceof Object) {
-		if (isQuiz(obj[id])) {
-			return obj[id];
+	const arr = JSON.parse(quiz)?.quizes;
+	if (arr instanceof Array) {
+		const quiz = arr.find((el: any) => el.id === id);
+
+		if (isQuiz(quiz)) {
+			return quiz;
 		}
 	}
 	return null;
 };
 
-export function* getQuizes(): Generator<[string, Quiz]> {
+/**
+ * Generator that returns all quizes.
+ */
+export function* getQuizes(): Generator<Quiz> {
 	const obj = JSON.parse(quiz);
-	if (obj instanceof Object) {
-		for (const id in obj) {
-			if (isQuiz(obj[id])) {
-				yield [ id, obj[id] ];
+	if (obj.quizes instanceof Array) {
+		for (const quiz of obj.quizes) {
+			if (isQuiz(quiz)) {
+				yield quiz;
 			}
 		}
 	}
