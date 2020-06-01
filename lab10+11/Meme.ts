@@ -40,15 +40,15 @@ export class Meme {
    * Set new price of meme
    * @param {number} price
    */
-  private async setPrice(price: number): Promise<void> {
+  private async setPrice(price: number, user: number): Promise<void> {
     this._price = price;
     const db = new Database("./memes.sqlite");
     return new Promise((res, rej) => {
       const insertStatement = db.prepare(
-        `INSERT INTO \`memes_prices\` VALUES (?, ?, DATETIME('now', 'localtime'))`,
+        `INSERT INTO \`memes_prices\` VALUES (?, ?, DATETIME('now', 'localtime'), ?)`,
         (err) => {
           if (err == null) {
-            insertStatement.run([price, this.id], (err) => {
+            insertStatement.run([price, this.id, user], (err) => {
               if (err == null) {
                 insertStatement.finalize((err) => {
                   err == null
@@ -83,15 +83,16 @@ export class Meme {
    * Sets new price of meme fron request
    * @param {any} rawPrice
    */
-  public async changePrice(rawPrice: any): Promise<void> {
+  public async changePrice(rawPrice: any, user: number): Promise<void> {
     const price =
       typeof rawPrice === "number"
         ? rawPrice
         : typeof rawPrice === "string"
         ? parseFloat(rawPrice)
         : null;
+
     if (price !== null && !isNaN(price)) {
-      return this.setPrice(price);
+      return this.setPrice(price, user);
     }
   }
 

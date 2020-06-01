@@ -5,6 +5,7 @@ import { getMostExpensive, getMeme } from "./memes";
 import session from "express-session";
 //@ts-ignore
 import SQLiteStore from "connect-sqlite3";
+import { loggedInMiddleware, registerUser, loginUser } from "./login";
 
 const app = express();
 const PORT = 3000;
@@ -19,13 +20,21 @@ app.use(
     secret: "f6e42f67904abd4d6ad031b24d697c9e",
     resave: false,
     saveUninitialized: true,
-    store: new (SQLiteStore(session))("./sessions.sqlite"),
+    store: new (SQLiteStore(session))(),
     cookie: { maxAge: 60 * 1000 * 15 },
   })
 );
 
-interface SessionRequest {
+app.use(async (req, res, next) => {
+  res.locals["visit"] = await updateAndGetVisits(<SessionRequest>req);
+  res.locals["user"] = req.session?.user;
+  res.locals["csrfToken"] = req.csrfToken();
+  next();
+});
+
+export interface SessionRequest extends express.Request {
   session: any;
+  sessionId: string;
 }
 
 const updateAndGetVisits = (req: SessionRequest) => {
@@ -38,34 +47,54 @@ const updateAndGetVisits = (req: SessionRequest) => {
 };
 
 app.get("/", async (req, res) => {
-  const visitNo = updateAndGetVisits(<SessionRequest>req);
   res.render("index", {
     title: "Meme market",
     message: "Hello there!",
     memes: await getMostExpensive(),
-    visit: visitNo,
   });
 });
+
 app.get("/meme/:memeId", async (req, res) => {
-  const visitNo = updateAndGetVisits(<SessionRequest>req);
   const meme = await getMeme(req.params.memeId);
   if (meme) {
     res.render("meme", {
       title: "Meme price history",
       meme: meme,
       priceHistory: await meme.getPriceHistory(),
-      csrfToken: req.csrfToken(),
-      visit: visitNo,
     });
   } else {
     res.status(404).send("Requested page doesn't exists!");
   }
 });
-app.post("/meme/:memeId", async (req, res) => {
+
+app.post("/login", async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  try {
+    if (req.body["sign-up"] === "on") {
+      if (!(await registerUser(username, password))) {
+        return res.status(400).send("Given username is taken");
+      }
+    }
+    if (await loginUser(<SessionRequest>req, username, password)) {
+      return res.redirect("back");
+    }
+    return res.status(400).send("Wrong password or username doesn't exist");
+  } catch (e) {
+    console.error(e);
+    return res.status(500).send("Internal server error");
+  }
+});
+app.post("/logout", async (req, res) => {
+  delete req.session?.user;
+  res.redirect("back");
+});
+
+app.post("/meme/:memeId", loggedInMiddleware, async (req, res) => {
   const meme = await getMeme(req.params.memeId);
   const price = req.body.price;
   if (meme) {
-    meme.changePrice(price);
+    meme.changePrice(price, <number>req.session?.user.id);
   }
   res.redirect(req.url);
 });

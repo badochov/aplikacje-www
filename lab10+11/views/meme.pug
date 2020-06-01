@@ -5,7 +5,7 @@ html
     style
         include style.css
     body
-        p #{"Numer wizyty:" + visit}
+        include user.pug
         a(href="/") #{"Go back to list"}
         h1=meme.desc.name
         div(class="meme")
@@ -25,8 +25,13 @@ html
                         th(class="col")=price.date
         h2="Change price"
         form(method="post")
+            unless user
+                p #{"You have to be logged in to change the price"}
+                <fieldset disabled="disabled">
             input(type="hidden", name="_csrf", value=csrfToken)
-            label(for="price")
+            label(for="price") #{"Nowa cena"}
             input(type="number", name="price", id="price", value=meme.price)
             br
             input(type="submit", value="Change")
+            unless user
+                </fieldset>

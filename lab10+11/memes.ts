@@ -1,6 +1,8 @@
 import type { MemeDesc } from "./Meme"; // eslint-disable-line
 import { Meme } from "./Meme";
 import { verbose, Database } from "sqlite3";
+import { hash } from "bcrypt";
+import { hashPassword } from "./login";
 export const getMostExpensive = async (
   amount: number = 3
 ): Promise<MemeDesc[]> => {
@@ -48,13 +50,14 @@ export const getMeme = async (rawId: string): Promise<Meme | undefined> => {
 };
 
 // może czasem nie zadziałać, bo ta biblioteka to callback hell, ale powinno działać w większości przypadków
-export const addMockMemes = () => {
+export const dbSetup = () => {
   const db = new Database("./memes.sqlite");
 
   db.exec(
     "CREATE TABLE IF NOT EXISTS memes (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, url TEXT);" +
-      "CREATE TABLE IF NOT EXISTS memes_prices (price INTEGER, meme_id INTEGER, dt VARCHAR(20));",
-    (err) => {
+      "CREATE TABLE IF NOT EXISTS memes_prices (price INTEGER, meme_id INTEGER, dt VARCHAR(20), user_id INTEGER);" +
+      "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT);",
+    async (err) => {
       const addMemeStatement = db.prepare(
         "INSERT INTO `memes` (name, url) VALUES (?, ?);"
       );
@@ -71,12 +74,19 @@ export const addMockMemes = () => {
       addMemeStatement.finalize();
 
       const addMemePriceStatement = db.prepare(
-        "INSERT INTO `memes_prices` VALUES (?, ?, DATETIME('now', 'localtime'));"
+        "INSERT INTO `memes_prices` VALUES (?, ?, DATETIME('now', 'localtime'), ?);"
       );
       for (const [i, price] of [1000, 1100, 1200].entries()) {
-        addMemePriceStatement.run([price, i + 1]);
+        addMemePriceStatement.run([price, i + 1, 1]);
       }
       addMemePriceStatement.finalize();
+
+      const addUserStatement = db.prepare(
+        "INSERT INTO `users` (username, password) VALUES (?, ?);"
+      );
+      const password = await hashPassword("password");
+      addUserStatement.run(["admin", password]);
+      addUserStatement.finalize();
 
       db.close();
     }
