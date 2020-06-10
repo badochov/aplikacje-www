@@ -8,25 +8,27 @@
     "lint": "eslint . --ext .ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx ts-node main.ts",
-    "watch": "nodemon main.ts",
-    "setup": "npx ts-node -e 'require(\"./db.ts\").dbSetup()' && npm --prefix ./views install ./views"
+    "watch": "nodemon --ignore views/ main.ts",
+    "setup": "npm run createdb && npm --prefix ./views install ./views",
+    "createdb": "npx ts-node -e 'require(\"./db.ts\").dbSetup()'"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.0",
     "better-sqlite3": "^7.0.1",
+    "body-parser": "^1.19.0",
     "connect-sqlite3": "^0.9.11",
     "cookie-parser": "^1.4.5",
     "csurf": "^1.11.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "pug": "^3.0.0",
-    "ts-node-dev": "^1.0.0-pre.44"
+    "pug": "^3.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
     "@types/better-sqlite3": "^5.4.0",
+    "@types/body-parser": "^1.19.0",
     "@types/cookie-parser": "^1.4.2",
     "@types/csurf": "^1.9.36",
     "@types/express": "^4.17.6",

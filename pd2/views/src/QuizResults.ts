@@ -1,13 +1,20 @@
-import { Answer, Quiz, getQuiz } from "./quiz";
+import {
+  Answer,
+  QuizNoAnswers,
+  getQuiz,
+  QuizWithAnswers,
+  getQuizWithAnswers,
+  getPrevResults,
+} from "./quiz";
 import {
   saveWithStatsButton,
-  saveButton,
   resultSection,
   initResultSpan,
   finalResultSpan,
   correctnessDiv,
   quizPrevResultsSection,
 } from "./HTMLElements";
+import { error } from "./main";
 
 export interface Result {
   finalTime: number;
@@ -21,14 +28,25 @@ const isResult = (obj: any): obj is Result => {
 
 export class QuizResults {
   private penalties: number[] = [];
+  private quizAnswers: QuizWithAnswers | null = null;
 
   /**
    * @param answers array of marked answers
    * @param quiz quiz object
    * @param quizId chosen quiz id
    */
-  constructor(private answers: Answer[], private quiz: Quiz | null) {
+  constructor(private answers: Answer[], private quiz: QuizNoAnswers | null) {
     this.bindEventHandlers();
+  }
+
+  public async mark() {
+    const quiz = await getQuizWithAnswers(this.quiz?.id.toString() || "");
+    if (quiz === null) {
+      error("Błąd podczas pobierania quizu");
+      window.location.reload();
+      return;
+    }
+    this.quizAnswers = quiz;
     this.checkAnswers();
     this.givePenalties();
     this.display();
@@ -38,10 +56,10 @@ export class QuizResults {
    * Checks answers, sets carrect argument in each answer to either true or false.
    */
   private checkAnswers() {
-    if (this.quiz !== null) {
+    if (this.quizAnswers !== null) {
       for (const i in this.answers) {
         this.answers[i].correct =
-          this.answers[i].answer === this.quiz.questions[i].answer;
+          this.answers[i].answer === this.quizAnswers.questions[i].answer;
       }
     }
   }
@@ -64,11 +82,6 @@ export class QuizResults {
    */
   private bindEventHandlers() {
     saveWithStatsButton.onclick = () => {
-      this.saveWithStats();
-      this.goToMainScreen();
-    };
-    saveButton.onclick = () => {
-      this.save();
       this.goToMainScreen();
     };
   }
@@ -78,35 +91,6 @@ export class QuizResults {
    */
   private goToMainScreen() {
     window.location.reload();
-  }
-
-  /**
-   * Saves run results with stats.
-   */
-  private saveWithStats() {
-    this.saveResult({
-      finalTime: this.finalTime,
-      answers: this.answers,
-      quizId: this.quiz?.id ?? "",
-    });
-  }
-
-  /**
-   * Saves run results without stats.
-   */
-  private save() {
-    this.saveResult({ finalTime: this.finalTime, quizId: this.quiz?.id ?? "" });
-  }
-
-  /**
-   * Saves given result.
-   * @param result result
-   */
-  private saveResult(result: Result) {
-    const prevJSON = localStorage.getItem("results") || "[]";
-    const prev = JSON.parse(prevJSON) as Array<Result>;
-    prev.push(result);
-    localStorage.setItem("results", JSON.stringify(prev));
   }
 
   /**
@@ -129,7 +113,7 @@ export class QuizResults {
   /**
    * Displays results.
    */
-  private display() {
+  private async display() {
     if (this.quiz) {
       resultSection.style.display = "block";
 
@@ -164,35 +148,59 @@ export class QuizResults {
    * Displays previous results.
    */
   public static async displayPreviousResults(): Promise<void> {
-    const results = JSON.parse(localStorage.getItem("results") || "{}");
+    let results;
+    try {
+      results = await getPrevResults();
+    } catch (_) {}
     let i = 1;
-    console.log(results);
+    let any = false;
     if (results instanceof Array) {
       for (const res of results) {
-        console.log(res, isResult(res));
+        any = true;
         if (isResult(res)) {
-          const quiz = await getQuiz(res.quizId);
+          const quiz = await getQuizWithAnswers(res.quizId);
           if (quiz) {
             const row = document.createElement("div");
             const nameCol = document.createElement("div");
             const resultCol = document.createElement("div");
+            const detailCol = document.createElement("div");
+            const link = document.createElement("a");
 
-            resultCol.className = "col-4 d-flex justify-content-center";
-            resultCol.textContent = QuizResults.formatTime(res.finalTime) + "s";
+            link.className = "btn btn-primary quiz-info-button";
+            link.dataset.quizId = quiz.id;
+            link.textContent = "Info";
+            link.href = "/results/" + quiz.id;
 
-            nameCol.className = "col-8 d-flex justify-content-center";
+            resultCol.className =
+              "col-4 d-flex justify-content-center align-items-center";
+            resultCol.textContent =
+              QuizResults.formatTime(res.finalTime / 1000) + "s";
+
+            nameCol.className =
+              "col-6 d-flex justify-content-center align-items-center";
             nameCol.textContent = quiz.desc;
 
+            detailCol.className =
+              "col-2 d-flex justify-content-center align-items-center";
+            detailCol.appendChild(link);
             row.className = `row prev-result ${i % 2 == 0 ? "even" : ""}`;
 
             row.appendChild(nameCol);
             row.appendChild(resultCol);
+            row.appendChild(detailCol);
 
             quizPrevResultsSection.appendChild(row);
             i++;
           }
         }
       }
+    }
+    if (!any) {
+      const row = document.createElement("div");
+      row.className = `row prev-result d-flex justify-content-center`;
+      row.textContent =
+        "Jeszcze nie rozwiązałeż żadnego quizu, na co czekasz? :)";
+      quizPrevResultsSection.appendChild(row);
     }
   }
 }

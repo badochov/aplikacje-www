@@ -1,4 +1,4 @@
-import { Quiz, getQuizes, getQuiz } from "./quiz";
+import { QuizNoAnswers, getQuizes, getQuiz } from "./quiz";
 import { QuizRun } from "./QuizRun";
 import { QuizResults } from "./QuizResults";
 import { quizesDiv, quizChoiseSection } from "./HTMLElements";
@@ -7,7 +7,7 @@ import { quizesDiv, quizChoiseSection } from "./HTMLElements";
  * Function that logs errors.
  * May in the future be overwriten to function that display error on screen.
  */
-export const error = console.error;
+export const error = (s: string) => alert(s);
 
 /**
  * Adds quiz to table of available quizes.
@@ -15,7 +15,7 @@ export const error = console.error;
  * @param id quiz id
  * @param quiz quiz object
  */
-const addQuizToTable = (quiz: Quiz) => {
+const addQuizToTable = (quiz: QuizNoAnswers) => {
   const row = document.createElement("div");
   const nameCol = document.createElement("div");
   const actionCol = document.createElement("div");
@@ -45,7 +45,6 @@ const addQuizToTable = (quiz: Quiz) => {
  */
 const displayQuizes = async () => {
   for await (const quiz of getQuizes()) {
-    console.log(quiz);
     addQuizToTable(quiz);
   }
 
@@ -62,3 +61,7 @@ const displayQuizes = async () => {
 displayQuizes();
 
 QuizResults.displayPreviousResults();
+
+export const csrfToken =
+  document?.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
+  "";

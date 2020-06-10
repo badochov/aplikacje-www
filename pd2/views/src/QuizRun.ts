@@ -1,4 +1,4 @@
-import { Quiz, Answer, getQuiz } from "./quiz";
+import { QuizNoAnswers, Answer, getQuiz, saveResults } from "./quiz";
 import { QuizResults } from "./QuizResults";
 import {
   descParagraph,
@@ -29,9 +29,10 @@ export class QuizRun {
   /**
    * @param quizId chosen quiz id
    */
-  constructor(private quiz: Quiz | null = null) {
+  constructor(private quiz: QuizNoAnswers | null = null) {
     if (this.quiz == null) {
-      error("Podany quiz nie istnieje");
+      console.log(error);
+      error("Ten quiz już jest rozwiązany przez Ciebie");
       return;
     } else if (this.quiz.questions.length == 0) {
       error("Podany quiz ma za mało pytań");
@@ -177,10 +178,11 @@ export class QuizRun {
   /**
    * End quiz. Displays results.
    */
-  private endQuiz(): void {
+  private async endQuiz() {
     this.saveAnswerTime();
     excerciseSection.style.display = "none";
-
+    await saveResults(this.answers, this.quiz?.id || "-1");
     this.quizResults = new QuizResults(this.answers, this.quiz);
+    this.quizResults.mark();
   }
 }

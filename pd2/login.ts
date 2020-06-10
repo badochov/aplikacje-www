@@ -39,6 +39,10 @@ export const logoutUser = (req: SessionRequest) => {
   delete req.session.user;
 };
 
+export const getUsers = (): User[] => {
+  return <User[]>db.prepare("SELECT * FROM `users`").all();
+};
+
 export const getUser = (username: string): User => {
   const user = db
     .prepare("SELECT * FROM `users` where username = ?")

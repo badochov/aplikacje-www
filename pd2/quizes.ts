@@ -1,16 +1,27 @@
-import { Quiz, Question } from "./Quiz";
+import { QuizWithAnswers, Question } from "./Quiz";
 
 import { db, QuizesRow, AnswersRow } from "./db";
-import type { User } from "./login";
+import { User, getUsers } from "./login";
 import type { Result } from "./views/src/QuizResults";
 import type { Answer } from "./views/src/quiz";
+import type { QuestionNoAnswer } from "./views/src/quiz";
 
-export const getQuizes = (): Quiz[] => {
-  const quizes: Quiz[] = [];
+export interface UserNoPassword {
+  username: string;
+  id: number;
+}
+export interface QuizNoAnswers {
+  id: number;
+  desc: string;
+  questions: QuestionNoAnswer[];
+}
+
+export const getQuizes = (): QuizWithAnswers[] => {
+  const quizes: QuizWithAnswers[] = [];
 
   const quizBaseData = <QuizesRow[]>db.prepare("SELECT * FROM quizes").all();
   for (const quizBase of quizBaseData) {
-    const quiz = new Quiz(quizBase.id, quizBase.desc);
+    const quiz = new QuizWithAnswers(quizBase.id, quizBase.desc);
     const questions = <Question[]>(
       db
         .prepare(
@@ -25,55 +36,113 @@ export const getQuizes = (): Quiz[] => {
   return quizes;
 };
 
-export const getQuiz = (rawId: string | number): Quiz | undefined => {
+export const getQuiz = (
+  rawId: string | number
+): QuizWithAnswers | undefined => {
   const id = typeof rawId === "number" ? rawId : parseInt(rawId);
 
   return getQuizes().find((quiz) => quiz.id === id);
 };
 
 export const didQuiz = (rawQuizId: string | number, user: User): boolean => {
-  const count = <number>(
+  const count = db
+    .prepare(
+      "SELECT COUNT(*) as cnt FROM answers WHERE quiz_id = ? and user_id = ?"
+    )
+    .get([
+      typeof rawQuizId === "number" ? rawQuizId : parseInt(rawQuizId),
+      user.id,
+    ]);
+  return count.cnt !== 0;
+};
+
+export const getQuizResults = (
+  userId: number,
+  rawQuizId: string | number
+): Result | null => {
+  const answers = <AnswersRow[]>(
     db
-      .prepare("SELECT COUNT(*) FROM answers WHERE quiz_id = ? and user_id = ?")
-      .get([
-        typeof rawQuizId === "number" ? rawQuizId : parseInt(rawQuizId),
-        user.id,
-      ])
+      .prepare("SELECT * FROM answers WHERE user_id = ? AND quiz_id = ?")
+      .all([userId, rawQuizId])
   );
-  return count === 0;
+  if (answers.length === 0) {
+    return null;
+  }
+
+  const quiz = getQuiz(rawQuizId);
+
+  const numberAnswers: Answer[] = answers.map((answer) => {
+    return {
+      answer: answer.answer,
+      time: answer.time,
+      correct: quiz?.questions[answer.question_number].anwer === answer.answer,
+    };
+  });
+  return {
+    quizId: rawQuizId.toString(),
+    answers: numberAnswers,
+    finalTime: numberAnswers.reduce((sum, answer) => sum + answer.time, 0),
+  };
 };
 
 export const prevResults = (user: User): Result[] => {
   const results: Result[] = [];
-  const answers = <AnswersRow[]>(
-    db.prepare("SELECT * FROM answers WHERE user_id = ?").all([user.id])
-  );
-  const groupedAnswers = answers.reduce(
-    (grouped: { [id: number]: AnswersRow[] }, answer) => {
-      if (grouped[answer.quiz_id] !== undefined) {
-        grouped[answer.quiz_id] = [];
-      }
-      grouped[answer.quiz_id].push(answer);
-      return grouped;
-    },
-    {}
-  );
-  for (const [id, answers] of Object.entries(groupedAnswers)) {
-    const quiz = getQuiz(id);
-
-    const numberAnswers: Answer[] = answers.map((answer) => {
-      return {
-        answer: answer.answer,
-        time: answer.time,
-        correct:
-          quiz?.questions[answer.question_number].anwer === answer.answer,
-      };
-    });
-    results.push({
-      quizId: id,
-      answers: numberAnswers,
-      finalTime: numberAnswers.reduce((sum, answer) => sum + answer.time, 0),
-    });
+  for (const quiz of getQuizes()) {
+    const result = getQuizResults(user.id, quiz.id);
+    if (result !== null) {
+      results.push(result);
+    }
   }
   return results;
+};
+
+export const getAllQuizResults = (
+  rawQuizId: number | string
+): Array<[User, Result]> => {
+  const results: Array<[User, Result]> = [];
+
+  for (const user of getUsers()) {
+    const result = getQuizResults(user.id, rawQuizId);
+    if (result !== null) {
+      results.push([user, result]);
+    }
+  }
+  return results;
+};
+
+export const getTop5ResultsForQuiz = (
+  rawId: string | number
+): Array<[User, Result]> => {
+  const results = getAllQuizResults(rawId);
+  return results
+    .sort((a, b) => a[1].finalTime - b[1].finalTime)
+    .map((a) => {
+      delete a[0].password;
+      return a;
+    })
+    .slice(0, 5);
+};
+
+export const getQuizNoAnswers = (
+  quizRawId: string | number
+): QuizNoAnswers | undefined => {
+  const quiz = getQuiz(quizRawId);
+  if (quiz === undefined) {
+    return quiz;
+  }
+  quiz.questions.forEach((q) => delete q.anwer);
+  return quiz;
+};
+
+export const getAnswerMeanTime = (
+  quizId: string | number
+): number[] | undefined => {
+  const quiz = getQuiz(quizId);
+  if (quiz === undefined) {
+    return undefined;
+  }
+  const results = getAllQuizResults(quizId);
+  const times: number[] = Array(quiz.questions.length).fill(-1);
+
+  return times.map((sum) => sum / (results.length || 1));
 };

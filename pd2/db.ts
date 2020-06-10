@@ -30,10 +30,18 @@ process.on("SIGTERM", () => process.exit(128 + 15));
 
 export const createTables = () => {
   db.exec(
+    "DROP TABLE IF EXISTS quizes;" +
+      "DROP TABLE IF EXISTS questions;" +
+      "DROP TABLE IF EXISTS answers;" +
+      "DROP TABLE IF EXISTS users;" +
+      "DROP TABLE IF EXISTS send_times"
+  );
+  db.exec(
     "CREATE TABLE IF NOT EXISTS quizes (id INTEGER PRIMARY KEY AUTOINCREMENT, desc TEXT);" +
       "CREATE TABLE IF NOT EXISTS questions (quiz_id INTEGER, question_number INTEGER, prompt TEXT, answer INTEGER, penalty INTEGER);" +
       "CREATE TABLE IF NOT EXISTS answers (quiz_id INTEGER, question_number INTEGER, time INTEGER, answer INTEGER, user_id INTEGER);" +
-      "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT);"
+      "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT);" +
+      "CREATE TABLE IF NOT EXISTS send_times (quiz_id INTEGER, user_id INTEGER, time INTEGER);"
   );
 };
 
@@ -116,9 +124,11 @@ const seedUsers = async () => {
   const addUserStatement = db.prepare(
     "INSERT INTO `users` (username, password) VALUES (?, ?);"
   );
-  const password = await hashPassword("password");
+  const password1 = await hashPassword("user1");
+  const password2 = await hashPassword("user2");
 
-  addUserStatement.run(["admin", password]);
+  addUserStatement.run(["user1", password1]);
+  addUserStatement.run(["user2", password2]);
 };
 
 const seedTables = async () => {

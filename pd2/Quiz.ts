@@ -1,10 +1,10 @@
-export interface Question {
-  prompt: string;
+import { QuestionNoAnswer } from "./views/src/quiz";
+
+export interface Question extends QuestionNoAnswer {
   anwer: number;
-  penalty: number;
 }
 
-export class Quiz {
+export class QuizWithAnswers {
   constructor(
     public id: number,
     public desc: string,

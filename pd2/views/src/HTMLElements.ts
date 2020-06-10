@@ -33,7 +33,6 @@ export const correctnessDiv = document.getElementById(
 export const resultSection = document.getElementById(
   "result"
 ) as HTMLDivElement;
-export const saveButton = document.getElementById("save") as HTMLButtonElement;
 export const saveWithStatsButton = document.getElementById(
   "save-with-stats"
 ) as HTMLButtonElement;
