@@ -1,20 +1,22 @@
 import {
   Answer,
-  QuizNoAnswers,
-  getQuiz,
   QuizWithAnswers,
   getQuizWithAnswers,
   getPrevResults,
+  averageTimes,
+  topScores,
 } from "./quiz";
 import {
   saveWithStatsButton,
-  resultSection,
   initResultSpan,
   finalResultSpan,
   correctnessDiv,
   quizPrevResultsSection,
+  correctAnswersSection,
+  averageTimesSection,
+  topScoresSection,
 } from "./HTMLElements";
-import { error } from "./main";
+import { error } from "./util";
 
 export interface Result {
   finalTime: number;
@@ -28,25 +30,17 @@ const isResult = (obj: any): obj is Result => {
 
 export class QuizResults {
   private penalties: number[] = [];
-  private quizAnswers: QuizWithAnswers | null = null;
 
   /**
    * @param answers array of marked answers
    * @param quiz quiz object
    * @param quizId chosen quiz id
    */
-  constructor(private answers: Answer[], private quiz: QuizNoAnswers | null) {
+  constructor(private answers: Answer[], private quiz: QuizWithAnswers) {
     this.bindEventHandlers();
   }
 
-  public async mark() {
-    const quiz = await getQuizWithAnswers(this.quiz?.id.toString() || "");
-    if (quiz === null) {
-      error("Błąd podczas pobierania quizu");
-      window.location.reload();
-      return;
-    }
-    this.quizAnswers = quiz;
+  public mark() {
     this.checkAnswers();
     this.givePenalties();
     this.display();
@@ -56,11 +50,9 @@ export class QuizResults {
    * Checks answers, sets carrect argument in each answer to either true or false.
    */
   private checkAnswers() {
-    if (this.quizAnswers !== null) {
-      for (const i in this.answers) {
-        this.answers[i].correct =
-          this.answers[i].answer === this.quizAnswers.questions[i].answer;
-      }
+    for (const i in this.answers) {
+      this.answers[i].correct =
+        this.answers[i].answer === this.quiz.questions[i].answer;
     }
   }
 
@@ -68,12 +60,10 @@ export class QuizResults {
    * Gives penalties for each wrong answer.
    */
   private givePenalties() {
-    if (this.quiz !== null) {
-      for (const i in this.answers) {
-        this.penalties.push(
-          this.answers[i].correct ? 0 : this.quiz.questions[i].penalty
-        );
-      }
+    for (const i in this.answers) {
+      this.penalties.push(
+        this.answers[i].correct ? 0 : this.quiz.questions[i].penalty
+      );
     }
   }
 
@@ -90,7 +80,7 @@ export class QuizResults {
    * Goes back to main screen.
    */
   private goToMainScreen() {
-    window.location.reload();
+    window.location.href = "/";
   }
 
   /**
@@ -109,31 +99,94 @@ export class QuizResults {
       this.initTime
     );
   }
+  private displayUserResults() {
+    initResultSpan.textContent = QuizResults.formatTime(this.initTime);
+    finalResultSpan.textContent = QuizResults.formatTime(this.finalTime);
+
+    // console.log(this.answers.entries());
+    for (const [i, answer] of this.answers.entries()) {
+      console.log(i, answer);
+      const div = document.createElement("div");
+      div.textContent = `${i + 1}. `;
+      const span = document.createElement("span");
+      const time = document.createElement("span");
+      span.className = answer.correct ? "correct" : "incorrect";
+      span.textContent = answer.correct
+        ? "Poprawnie :)"
+        : `Błąd: +${this.quiz.questions[i].penalty}s`;
+      time.textContent = `  ${QuizResults.formatTime(answer.time / 1000)} s`;
+      div.appendChild(span);
+      div.appendChild(time);
+      correctnessDiv.appendChild(div);
+    }
+  }
+  private displayCorrectAnswers() {
+    // console.log(this.answers.entries());
+    for (const [i, question] of this.quiz.questions.entries()) {
+      const div = document.createElement("div");
+      div.textContent = `${i + 1}. `;
+      const span = document.createElement("span");
+      span.textContent = `${question.prompt} = ${question.answer}`;
+      div.appendChild(span);
+      correctAnswersSection.appendChild(div);
+    }
+  }
+  private async displayAverageTimes() {
+    // console.log(this.answers.entries());
+    const times = await averageTimes(this.quiz.id.toString());
+    console.log(times);
+    if (times === null) {
+      error("Nie udało pobrać się średnich czasów na odpowiedź");
+      return;
+    }
+    for (const [i, time] of times.entries()) {
+      const div = document.createElement("div");
+      div.textContent = `${i + 1}. `;
+      const span = document.createElement("span");
+      span.textContent = `${
+        time ? QuizResults.formatTime(time / 1000) : "--.--"
+      }s`;
+      div.appendChild(span);
+      averageTimesSection.appendChild(div);
+    }
+  }
+  private async displayTopScores() {
+    // console.log(this.answers.entries());
+    const scores = await topScores(this.quiz.id.toString());
+    console.log(scores);
+    if (scores === null) {
+      error("Nie udało pobrać się najlepszych wyników");
+      return;
+    }
+    for (const [i, [user, result]] of scores.entries()) {
+      const div = document.createElement("div");
+      const h3 = document.createElement("h3");
+      // div.textContent = `${i + 1}. `;
+      const timeP = document.createElement("p");
+      timeP.textContent = `Czas: ${QuizResults.formatTime(
+        result.finalTime / 1000
+      )}s`;
+      const answersP = document.createElement("p");
+      answersP.textContent = `Poprawne odpowiedzi: ${result.answers?.reduce(
+        (sum, ans) => (ans.correct ? sum + 1 : sum),
+        0
+      )} / ${result.answers?.length}`;
+      h3.textContent = user.username;
+      div.appendChild(h3);
+      div.appendChild(timeP);
+      div.appendChild(answersP);
+      topScoresSection.appendChild(div);
+    }
+  }
 
   /**
    * Displays results.
    */
   private async display() {
-    if (this.quiz) {
-      resultSection.style.display = "block";
-
-      initResultSpan.textContent = QuizResults.formatTime(this.initTime);
-      finalResultSpan.textContent = QuizResults.formatTime(this.finalTime);
-
-      // console.log(this.answers.entries());
-      for (const [i, answer] of this.answers.entries()) {
-        console.log(i, answer);
-        const div = document.createElement("div");
-        div.textContent = `${i + 1}. `;
-        const span = document.createElement("span");
-        span.className = answer.correct ? "correct" : "incorrect";
-        span.textContent = answer.correct
-          ? "Correct :)"
-          : `Incorect: +${this.quiz.questions[i].penalty}s`;
-        div.appendChild(span);
-        correctnessDiv.appendChild(div);
-      }
-    }
+    this.displayUserResults();
+    this.displayCorrectAnswers();
+    await this.displayAverageTimes();
+    await this.displayTopScores();
   }
 
   /**

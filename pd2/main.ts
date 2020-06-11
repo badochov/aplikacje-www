@@ -9,6 +9,7 @@ import {
   getTop5ResultsForQuiz,
   getQuizNoAnswers,
   getAnswerMeanTime,
+  getAnswers,
 } from "./quizes";
 import session from "express-session";
 //@ts-ignore
@@ -72,7 +73,7 @@ app.get("/", (req, res) => {
 
 app.get("/get_quizes", (req, res) => {
   const quizes = getQuizes();
-  quizes.forEach((quiz) => quiz.questions.forEach((q) => delete q.anwer));
+  quizes.forEach((quiz) => quiz.questions.forEach((q) => delete q.answer));
   res.json(quizes);
 });
 
@@ -94,6 +95,14 @@ app.get("/get_quiz_with_answers/:quiz_id", loggedInMiddleware, (req, res) => {
   }
   res.json(getQuiz(quizId));
 });
+app.get("/get_answers/:quiz_id", loggedInMiddleware, (req, res) => {
+  const user = getUser(<SessionRequest>req);
+  const quizId = req.params.quiz_id;
+  if (!didQuiz(quizId, user)) {
+    return res.status(403).json();
+  }
+  res.json(getAnswers(user.id, quizId));
+});
 
 app.get("/results/:quiz_id", loggedInMiddleware, (req, res) => {
   return res.render("results");
@@ -110,8 +119,12 @@ app.post("/post_results/:quiz_id", loggedInMiddleware, (req, res) => {
   }
 
   const obj = req.body;
-  console.log(obj);
-  if (isQuizResult(obj) && validateQuizResult(obj)) {
+  const quiz = getQuiz(req.params.quiz_id);
+  if (
+    quiz !== undefined &&
+    isQuizResult(obj) &&
+    validateQuizResult(obj, quiz)
+  ) {
     const user = getUser(<SessionRequest>req);
     const time = getTime(user.id, quizId);
     saveResults(user.id, quizId, obj, time);

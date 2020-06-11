@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { QuizNoAnswers } from "./quizes";
 
 export interface QuizResult {
   times: number[];
@@ -13,9 +14,14 @@ export const isQuizResult = (obj: any): obj is QuizResult => {
   return obj.times instanceof Array && obj.answers instanceof Array;
 };
 
-export const validateQuizResult = (qr: QuizResult): boolean => {
-  console.log("fadfad");
-  return 0.001 > Math.abs(qr.times.reduce((sum, el) => sum + el, 0) - 1);
+export const validateQuizResult = (
+  qr: QuizResult,
+  quiz: QuizNoAnswers
+): boolean => {
+  return (
+    0.001 > Math.abs(qr.times.reduce((sum, el) => sum + el, 0) - 1) &&
+    quiz.questions.length === qr.answers.length
+  );
 };
 
 export const saveTime = (userId: number, quizId: number) => {

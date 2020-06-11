@@ -1,98 +1,98 @@
 #excercise {
-	display: none;
+  display: none;
 }
 
-#result {
-	display: none;
+.main-page #result {
+  display: none;
 }
 
 .correct {
-	color: lime;
+  color: lime;
 }
 
 .incorrect {
-	color: red;
+  color: red;
 }
 
 #penalty-time {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 #prompt {
-	font-weight: bold;
-	font-size: 2em;
+  font-weight: bold;
+  font-size: 2em;
 }
 
 #final-result {
-	font-weight: bold;
-	font-size: 1.2em;
+  font-weight: bold;
+  font-size: 1.2em;
 }
 
 #init-result {
-	font-weight: bold;
-	font-size: 1.1em;
+  font-weight: bold;
+  font-size: 1.1em;
 }
 
 #quiz-desc {
-	display: none;
+  display: none;
 }
 
 .even {
-	background-color: lightgray;
+  background-color: lightgray;
 }
 
 .table-header {
-	font-size: 1.5em;
-	background-color: lightblue;
-	padding: 15px;
+  font-size: 1.5em;
+  background-color: lightblue;
+  padding: 15px;
 }
 
 .row {
-	border-radius: 10px;
+  border-radius: 10px;
 }
 
 h1 {
-	text-align: center;
+  text-align: center;
 }
 
 .main-header {
-	text-align: center;
+  text-align: center;
 }
 
 #quiz-choise,
 #quiz-desc {
-	margin: 25px 0 50px 0;
+  margin: 25px 0 50px 0;
 }
 
 #desc-wrapper {
-	background-color: lightgray;
-	border-radius: 10px;
+  background-color: lightgray;
+  border-radius: 10px;
 }
 
 #desc {
-	padding: 15px;
+  padding: 15px;
 }
 
 #quizes > .row:not(.table-header) {
-	background-color: lightgoldenrodyellow;
-	margin-top: 10px;
-	padding: 5px;
+  background-color: lightgoldenrodyellow;
+  margin-top: 10px;
+  padding: 5px;
 }
 
 .prev-result {
-	padding: 5px;
+  padding: 5px;
 }
 
 .quick-access-node.answered {
-	background-color: lightgray;
+  background-color: lightgray;
 }
 
 .quick-access-node {
-	border: 1px black solid;
-	padding: 5px;
-	margin-right: 10px;
-	cursor: pointer;
+  border: 1px black solid;
+  padding: 5px;
+  margin-right: 10px;
+  cursor: pointer;
 }
 #quick-access {
-	margin-bottom: 10px;
+  margin-bottom: 10px;
 }

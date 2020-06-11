@@ -29,10 +29,12 @@ export const checkUserPassword = async (
   return await compare(password, user.password);
 };
 
-export interface User {
+export interface User extends UserNoPassword {
+  password: string;
+}
+export interface UserNoPassword {
   id: number;
   username: string;
-  password: string;
 }
 
 export const logoutUser = (req: SessionRequest) => {

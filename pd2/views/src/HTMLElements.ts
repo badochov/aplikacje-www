@@ -50,6 +50,15 @@ export const finalResultSpan = document.getElementById(
 export const quizPrevResultsSection = document.getElementById(
   "quiz-prev-results"
 ) as HTMLDivElement;
+export const correctAnswersSection = document.getElementById(
+  "correct-answers"
+) as HTMLDivElement;
+export const averageTimesSection = document.getElementById(
+  "average-times"
+) as HTMLDivElement;
+export const topScoresSection = document.getElementById(
+  "top-scores"
+) as HTMLDivElement;
 export const quickAccessDiv = document.getElementById(
   "quick-access"
 ) as HTMLDivElement;

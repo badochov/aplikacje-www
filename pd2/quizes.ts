@@ -55,6 +55,16 @@ export const didQuiz = (rawQuizId: string | number, user: User): boolean => {
     ]);
   return count.cnt !== 0;
 };
+export const getAnswersRow = (
+  userId: number,
+  rawQuizId: string | number
+): AnswersRow[] => {
+  return <AnswersRow[]>(
+    db
+      .prepare("SELECT * FROM answers WHERE user_id = ? AND quiz_id = ?")
+      .all([userId, rawQuizId])
+  );
+};
 
 export const getQuizResults = (
   userId: number,
@@ -75,13 +85,19 @@ export const getQuizResults = (
     return {
       answer: answer.answer,
       time: answer.time,
-      correct: quiz?.questions[answer.question_number].anwer === answer.answer,
+      correct: quiz?.questions[answer.question_number].answer === answer.answer,
     };
   });
   return {
     quizId: rawQuizId.toString(),
     answers: numberAnswers,
-    finalTime: numberAnswers.reduce((sum, answer) => sum + answer.time, 0),
+    finalTime: numberAnswers.reduce(
+      (sum, answer, i) =>
+        sum +
+        answer.time +
+        (answer.correct ? 0 : quiz?.questions[i].penalty || 0),
+      0
+    ),
   };
 };
 
@@ -112,7 +128,7 @@ export const getAllQuizResults = (
 
 export const getTop5ResultsForQuiz = (
   rawId: string | number
-): Array<[User, Result]> => {
+): Array<[UserNoPassword, Result]> => {
   const results = getAllQuizResults(rawId);
   return results
     .sort((a, b) => a[1].finalTime - b[1].finalTime)
@@ -130,7 +146,7 @@ export const getQuizNoAnswers = (
   if (quiz === undefined) {
     return quiz;
   }
-  quiz.questions.forEach((q) => delete q.anwer);
+  quiz.questions.forEach((q) => delete q.answer);
   return quiz;
 };
 
@@ -142,7 +158,29 @@ export const getAnswerMeanTime = (
     return undefined;
   }
   const results = getAllQuizResults(quizId);
-  const times: number[] = Array(quiz.questions.length).fill(-1);
-
+  const times: number[] = Array(quiz.questions.length).fill(0);
+  results.forEach(([_, result]) => {
+    if (result.answers) {
+      result.answers.forEach((answer, i) => (times[i] += answer.time));
+    }
+  });
   return times.map((sum) => sum / (results.length || 1));
+};
+
+export const getAnswers = (
+  userId: number,
+  quizId: string | number
+): Answer[] => {
+  const rawAnswers = getAnswersRow(userId, quizId);
+  const answers: Answer[] = [];
+  rawAnswers.forEach(
+    (rawAns) =>
+      (answers[rawAns.question_number] = {
+        answer: rawAns.answer,
+        time: rawAns.time,
+        correct: false,
+      })
+  );
+
+  return answers;
 };

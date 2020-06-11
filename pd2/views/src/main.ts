@@ -1,13 +1,7 @@
 import { QuizNoAnswers, getQuizes, getQuiz } from "./quiz";
 import { QuizRun } from "./QuizRun";
 import { QuizResults } from "./QuizResults";
-import { quizesDiv, quizChoiseSection } from "./HTMLElements";
-
-/**
- * Function that logs errors.
- * May in the future be overwriten to function that display error on screen.
- */
-export const error = (s: string) => alert(s);
+import { quizesDiv } from "./HTMLElements";
 
 /**
  * Adds quiz to table of available quizes.
@@ -61,7 +55,3 @@ const displayQuizes = async () => {
 displayQuizes();
 
 QuizResults.displayPreviousResults();
-
-export const csrfToken =
-  document?.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
-  "";

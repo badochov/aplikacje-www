@@ -1,7 +1,7 @@
 import { QuestionNoAnswer } from "./views/src/quiz";
 
 export interface Question extends QuestionNoAnswer {
-  anwer: number;
+  answer: number;
 }
 
 export class QuizWithAnswers {

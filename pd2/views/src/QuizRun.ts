@@ -1,5 +1,4 @@
-import { QuizNoAnswers, Answer, getQuiz, saveResults } from "./quiz";
-import { QuizResults } from "./QuizResults";
+import { QuizNoAnswers, Answer, saveResults } from "./quiz";
 import {
   descParagraph,
   answerInput,
@@ -16,7 +15,7 @@ import {
   quizPrevResultsSection,
   quickAccessDiv,
 } from "./HTMLElements";
-import { error } from "./main";
+import { error } from "./util";
 
 export class QuizRun {
   private questionNumber: number = 0;
@@ -24,7 +23,6 @@ export class QuizRun {
 
   private answers: Answer[] = [];
   private penalties: number[] = [];
-  private quizResults: QuizResults | null = null;
 
   /**
    * @param quizId chosen quiz id
@@ -182,7 +180,6 @@ export class QuizRun {
     this.saveAnswerTime();
     excerciseSection.style.display = "none";
     await saveResults(this.answers, this.quiz?.id || "-1");
-    this.quizResults = new QuizResults(this.answers, this.quiz);
-    this.quizResults.mark();
+    window.location.href = "/results/" + this.quiz?.id;
   }
 }

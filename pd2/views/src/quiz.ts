@@ -1,6 +1,7 @@
 import { Result } from "./QuizResults";
 import { RawQuizResult } from "../../results";
-import { csrfToken } from "./main";
+import { csrfToken } from "./util";
+import { User } from "../../login";
 
 export interface QuestionNoAnswer {
   prompt: string;
@@ -125,4 +126,40 @@ export const saveResults = async (answers: Answer[], quizId: string) => {
     },
     body: JSON.stringify(qr),
   });
+};
+
+export const getAnswers = async (quizId: string): Promise<Answer[] | null> => {
+  try {
+    const raw = await fetch("/get_answers/" + quizId);
+    const obj = await raw.json();
+    if (obj instanceof Array) {
+      return <Answer[]>obj;
+    }
+  } catch (_) {}
+  return null;
+};
+
+export const averageTimes = async (
+  quizId: string
+): Promise<number[] | null> => {
+  try {
+    const raw = await fetch("/get_answers_mean_time/" + quizId);
+    const obj = await raw.json();
+    if (obj instanceof Array) {
+      return <number[]>obj;
+    }
+  } catch (_) {}
+  return null;
+};
+export const topScores = async (
+  quizId: string
+): Promise<[User, Result][] | null> => {
+  try {
+    const raw = await fetch("/top_scores/" + quizId);
+    const obj = await raw.json();
+    if (obj instanceof Array) {
+      return <[User, Result][]>obj;
+    }
+  } catch (_) {}
+  return null;
 };

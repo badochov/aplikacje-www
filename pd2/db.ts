@@ -126,9 +126,11 @@ const seedUsers = async () => {
   );
   const password1 = await hashPassword("user1");
   const password2 = await hashPassword("user2");
+  const password3 = await hashPassword("test");
 
   addUserStatement.run(["user1", password1]);
   addUserStatement.run(["user2", password2]);
+  addUserStatement.run(["test", password3]);
 };
 
 const seedTables = async () => {
