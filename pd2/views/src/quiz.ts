@@ -36,7 +36,7 @@ const isQuestion = (question: any): question is QuestionNoAnswer => {
   return question && question.prompt && question.answer && question.penalty;
 };
 
-const isQuiz = (quiz: any): quiz is QuizNoAnswers => {
+export const isQuiz = (quiz: any): quiz is QuizNoAnswers => {
   return quiz.desc && quiz.questions && quiz.id !== undefined;
 };
 const isQuizWithAnswers = (quiz: any): quiz is QuizWithAnswers => {

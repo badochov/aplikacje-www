@@ -84,6 +84,7 @@ app.get("/get_quiz/:quiz_id", loggedInMiddleware, (req, res) => {
     return res.status(403).json();
   }
   res.json(getQuizNoAnswers(quizId));
+  console.log(getQuizNoAnswers(quizId));
   saveTime(user.id, parseInt(req.params.quiz_id));
 });
 
