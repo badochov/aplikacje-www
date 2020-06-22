@@ -45,12 +45,14 @@ export const getUsers = (): User[] => {
   return <User[]>db.prepare("SELECT * FROM `users`").all();
 };
 
+export class NoUserError extends Error {}
+
 export const getUser = (username: string): User => {
   const user = db
     .prepare("SELECT * FROM `users` where username = ?")
     .get(username);
   if (user !== undefined) return <User>user;
-  throw new Error("Nie ma użytkownika o danym id");
+  throw new NoUserError();
 };
 
 export const loginUser = async (
@@ -109,4 +111,25 @@ export const registerUser = async (
   ]);
 
   return true;
+};
+
+export const fillDBWithInitialUsers = async () => {
+  const addUserStatement = db.prepare(
+    "INSERT INTO `users` (username, password) VALUES (?, ?);"
+  );
+
+  const password1 = await hashPassword("user1");
+  const password2 = await hashPassword("user2");
+  const password3 = await hashPassword("test");
+
+  addUserStatement.run(["user1", password1]);
+  addUserStatement.run(["user2", password2]);
+  addUserStatement.run(["test", password3]);
+};
+
+export const createUsersTable = () => {
+  db.exec(
+    "DROP TABLE IF EXISTS users;" +
+      "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT);"
+  );
 };

@@ -211,8 +211,18 @@ export class QuizResults {
       for (const res of results) {
         any = true;
         if (isResult(res)) {
+          console.log(res);
           const quiz = await getQuizWithAnswers(res.quizId);
           if (quiz) {
+            const finalTime =
+              res.finalTime +
+              quiz.questions.reduce((sum, question, i) => {
+                console.log(sum, res.answers, i);
+                if (res.answers && !res.answers[i].correct) {
+                  return sum + question.penalty * 1000;
+                }
+                return sum;
+              }, 0);
             const row = document.createElement("div");
             const nameCol = document.createElement("div");
             const resultCol = document.createElement("div");
@@ -227,7 +237,7 @@ export class QuizResults {
             resultCol.className =
               "col-4 d-flex justify-content-center align-items-center";
             resultCol.textContent =
-              QuizResults.formatTime(res.finalTime / 1000) + "s";
+              QuizResults.formatTime(finalTime / 1000) + "s";
 
             nameCol.className =
               "col-6 d-flex justify-content-center align-items-center";

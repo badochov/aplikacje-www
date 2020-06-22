@@ -32,12 +32,14 @@ export const saveTime = (userId: number, quizId: number) => {
   ]);
 };
 
+export class DidntStartError extends Error {}
+
 export const getTime = (userId: number, quizId: number): number => {
   const time = db
     .prepare("SELECT time FROM send_times WHERE quiz_id = ? AND user_id = ?")
     .get([quizId, userId]);
   if (time === undefined) {
-    throw new Error("This user didn't start");
+    throw new DidntStartError();
   } else {
     return Date.now() - <number>time?.time;
   }
@@ -55,4 +57,11 @@ export const saveResults = (
     const answer = qr.answers[i];
     stmt.run([quizId, i, calculatedTime, answer, userId]);
   }
+};
+
+export const createSendTimesTable = () => {
+  db.exec("DROP TABLE IF EXISTS send_times");
+  db.exec(
+    "CREATE TABLE IF NOT EXISTS send_times (quiz_id INTEGER, user_id INTEGER, time INTEGER);"
+  );
 };
